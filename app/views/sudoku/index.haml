@@ -1,0 +1,13 @@
+%h1 Sudoku on Rails... you're new best friend
+%section#board
+    %h1 -Your Game Board-
+    %table
+        -for y in 1..9
+            %tr
+                -for x in 1..9
+                    %td
+                        %input{ :type=>'text' }
+
+#controls
+    %input{ :type=>'button', :value=>'Initialize' }
+
