@@ -38,5 +38,9 @@ module Raildoku
 
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password]
+
+    # Set Haml format
+    Haml::Template.options[:format] = :html5
   end
 end
+
