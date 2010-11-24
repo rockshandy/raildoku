@@ -49,6 +49,10 @@ $(function() {
         }
 
         $('#board table').append(textToInsert);
+
+        //redraw borders
+        $('#board tr, #board td').removeClass('grid');
+        drawBlockBorders();
     });
 });
 
