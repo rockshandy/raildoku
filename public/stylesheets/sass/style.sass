@@ -1,15 +1,32 @@
 // General
 h1
     :font-size 1.5em
+
 section h1
     :font-size 1.2em
+
+.error
+    :background-color red
+
 //Sudoku Board and controls
 #board
+    :margin-bottom 10px
     table
+        :border-collapse collapse
+        :border 1px solid black
         :text-align center
-    td
-        :font-weight bold
     input
         :font-weight none
+        :text-align center
         :width 20px
+    td, input[disabled]
+        :font-weight bold
+    tr.grid
+        :border-top 1px solid black
+    td.grid
+        :border-left 1px solid black
+
+#controls
+    input[type=number]
+        :width 40px
 

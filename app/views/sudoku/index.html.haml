@@ -8,8 +8,10 @@
                     %td
                         %input{ :type=>'text' }
 
-#controls
-    %input{ :type=>'button', :value=>'Initialize' }
-    %input{ :type=>'range', :min => 2, :max => 5}
-    %input{ :type=>'range', :min => 2, :max => 5}
+%section#controls
+    #dimensions
+        %input#width{ :type=>'number', :min => 2, :max => 7, :value => 3}
+        x
+        %input#height{ :type=>'number', :min => 2, :max => 7, :value => 3}
+    %input#init{ :type=>'button', :value=>'Initialize' }
 

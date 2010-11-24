@@ -4,10 +4,25 @@ h1 {
 section h1 {
   font-size: 1.2em; }
 
-#board table {
-  text-align: center; }
-#board td {
-  font-weight: bold; }
-#board input {
-  font-weight: none;
-  width: 20px; }
+.error {
+  background-color: red; }
+
+#board {
+  margin-bottom: 10px; }
+  #board table {
+    border-collapse: collapse;
+    border: 1px solid black;
+    text-align: center; }
+  #board input {
+    font-weight: none;
+    text-align: center;
+    width: 20px; }
+  #board td, #board input[disabled] {
+    font-weight: bold; }
+  #board tr.grid {
+    border-top: 1px solid black; }
+  #board td.grid {
+    border-left: 1px solid black; }
+
+#controls input[type=number] {
+  width: 40px; }
