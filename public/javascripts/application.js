@@ -26,42 +26,12 @@ $(function() {
     //need to fiure out how to change this whenever changes or clicked if that's possible?
     // like as soon as you with change the number if it regresses to text or on click if it's on an arrow?'
     $('#dimensions input').change(function(e) {
-        var $board = $('#board');
-        var newDim = { w: $('#width').val(),
-                       h: $('#height').val() }
-        var oldDim = { w: $board.find('tr:first td').length,
-                       h: $board.find('tr').length }
-        var textToInsert = '';
-        var max = maxVal();
+        var $board = $('#board')
+        // adjust the board as neded
+        modBoard($board,
+                 {w: $board.find('tr:first td').length,
+                  h: $board.find('tr').length });
 
-        // TODO: look at various js string multiplication methods
-        if (oldDim.w < max){
-            // add appropiate num of columns
-            // TODO:could need form to reset all the form values to blank but not big deal now
-            var cloneHtml = '<td>' + $board.find('td:first').html()  + '</td>';
-            for(i=oldDim.w;i<maxVal();i++) {
-                textToInsert += cloneHtml
-            }
-            $board.find('tr').append(textToInsert);
-        } else {
-            $board.find('tr').each(function(){
-                $(this).find('td:gt(' + (max - 1) + ')').remove();
-            });
-        }
-
-        if (oldDim.h < max){
-            textToInsert = '';
-            cloneHtml = '<tr>' + $board.find('tr:first').html() + '</tr>';
-
-            // add appropiate num of rows
-            for(i=oldDim.h;i<maxVal();i++) {
-                textToInsert += cloneHtml
-            }
-
-            $board.append(textToInsert);
-        } else {
-            $board.find('tr:gt(' + (max - 1) + ')').remove();
-        }
         //redraw borders
         drawBlockBorders();
     });
@@ -127,8 +97,39 @@ function maxVal() {
 /*@brief add or remove from board to match height and width values
  *
  *  @param $board   jquery object of board
+ *  @param dim      object with propperties w for width and h for height
  */
-function modBoard($board,height,width) {
+function modBoard($board,dim) {
+    var textToInsert = '';
+    var max = maxVal();
 
+    // TODO: look at various js string multiplication methods
+    if (dim.w < max){
+        var cloneHtml = '<td>' + $board.find('td:first').html()  + '</td>';
+        // add appropiate num of columns
+        // TODO:could need form to reset all the form values to blank but not big deal now
+        for(i=dim.w;i<max;i++) {
+            textToInsert += cloneHtml
+        }
+        $board.find('tr').append(textToInsert);
+        textToInsert = '';
+    } else {
+        //remove any un-needed columns
+        $board.find('tr').each(function(){
+            $(this).find('td:gt(' + (max - 1) + ')').remove();
+        });
+    }
+
+    if (dim.h < max){
+        cloneHtml = '<tr>' + $board.find('tr:first').html() + '</tr>';
+        // add appropiate num of rows
+        for(i=dim.h;i<max;i++) {
+            textToInsert += cloneHtml
+        }
+        $board.append(textToInsert);
+    } else {
+        // remove any un-needed rows
+        $board.find('tr:gt(' + (max - 1) + ')').remove();
+    }
 }
 
