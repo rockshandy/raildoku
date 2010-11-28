@@ -7,12 +7,15 @@ section h1 {
 .error {
   background-color: red; }
 
+#contentWrapper {
+  margin: 0px auto;
+  width: 800px;
+  text-align: center; }
+
 #board {
-  margin-bottom: 10px; }
-  #board table {
-    border-collapse: collapse;
-    border: 1px solid black;
-    text-align: center; }
+  border-collapse: collapse;
+  border: 1px solid black;
+  margin: 5px auto; }
   #board input {
     font-weight: none;
     text-align: center;

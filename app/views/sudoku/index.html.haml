@@ -1,7 +1,7 @@
 %h1 Sudoku on Rails... you're new best friend
-%section#board
+%section
     %h1 -Your Game Board-
-    %table
+    %table#board
         -for y in 1..9
             %tr
                 -for x in 1..9
@@ -10,8 +10,8 @@
 
 %section#controls
     #dimensions
-        %input#width{ :type=>'number', :min => 2, :max => 7, :value => 3}
+        %input#width{ :type=>'number', :min => 2, :max => 5, :value => 3}
         x
-        %input#height{ :type=>'number', :min => 2, :max => 7, :value => 3}
+        %input#height{ :type=>'number', :min => 2, :max => 5, :value => 3}
     %input#init{ :type=>'button', :value=>'Initialize' }
 

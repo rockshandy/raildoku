@@ -26,32 +26,43 @@ $(function() {
     //need to fiure out how to change this whenever changes or clicked if that's possible?
     // like as soon as you with change the number if it regresses to text or on click if it's on an arrow?'
     $('#dimensions input').change(function(e) {
-        //TODO: can probably reduce the uses of creating a new jquery object and just filter down? and max()
+        var $board = $('#board');
         var newDim = { w: $('#width').val(),
                        h: $('#height').val() }
-        var oldDim = { w: $('#board tr:first td').length,
-                       h: $('#board tr').length }
+        var oldDim = { w: $board.find('tr:first td').length,
+                       h: $board.find('tr').length }
         var textToInsert = '';
-        // TODO:could need form to reset all the form values to blank but not big deal now
-        var $tdClone = $('#board td:first');
+        var max = maxVal();
+
         // TODO: look at various js string multiplication methods
-        // add appropiate num of columns
-        for(i=oldDim.w;i<maxVal();i++) {
-            textToInsert += '<td>' + $tdClone.html() + '</td>'
+        if (oldDim.w < max){
+            // add appropiate num of columns
+            // TODO:could need form to reset all the form values to blank but not big deal now
+            var cloneHtml = '<td>' + $board.find('td:first').html()  + '</td>';
+            for(i=oldDim.w;i<maxVal();i++) {
+                textToInsert += cloneHtml
+            }
+            $board.find('tr').append(textToInsert);
+        } else {
+            $board.find('tr').each(function(){
+                $(this).find('td:gt(' + (max - 1) + ')').remove();
+            });
         }
-        $('#board tr').append(textToInsert);
-        textToInsert = '';
-        var $trClone = $('#board tr:first');
 
-        // add appropiate num of rows
-        for(i=oldDim.h;i<maxVal();i++) {
-            textToInsert += '<tr>' + $trClone.html() + '</tr>'
+        if (oldDim.h < max){
+            textToInsert = '';
+            cloneHtml = '<tr>' + $board.find('tr:first').html() + '</tr>';
+
+            // add appropiate num of rows
+            for(i=oldDim.h;i<maxVal();i++) {
+                textToInsert += cloneHtml
+            }
+
+            $board.append(textToInsert);
+        } else {
+            $board.find('tr:gt(' + (max - 1) + ')').remove();
         }
-
-        $('#board table').append(textToInsert);
-
         //redraw borders
-        $('#board tr, #board td').removeClass('grid');
         drawBlockBorders();
     });
 });
@@ -80,6 +91,8 @@ function validMove ($board,$pos) {
  *
  *  will be more general purpose later where you can use it like any jquery function
  */
+ //TODO: way to do this with straight css? perhaps look at nth or eq filters
+
 function drawBlockBorders() {
     var $board = $('#board');
     var height = $('#height').val();
@@ -91,15 +104,31 @@ function drawBlockBorders() {
     // could maybe do it in rails if this was an ajax call
     // or maybe add the position of a td to it's class? just seems messy
     $board.find('tr').each(function(i){
-        if (i % height === 0) $(this).addClass('grid');
+        if (i % height === 0) {
+            $(this).addClass('grid')
+        } else {
+            $(this).removeClass('grid');
+        }
 
         $(this).children('td').each(function(i){
-            if (i % height === 0) $(this).addClass('grid')
+            if (i % width === 0) {
+                $(this).addClass('grid')
+            } else {
+                $(this).removeClass('grid');
+            }
         })
     })
 }
 
 function maxVal() {
     return $('#width').val() * $('#height').val()
+}
+
+/*@brief add or remove from board to match height and width values
+ *
+ *  @param $board   jquery object of board
+ */
+function modBoard($board,height,width) {
+
 }
 
