@@ -27,5 +27,8 @@ section h1 {
   #board td.grid {
     border-left: 1px solid black; }
 
-#controls input[type=number] {
+#dimensions input[type=number] {
   width: 40px; }
+
+#help {
+  display: none; }

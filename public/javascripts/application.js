@@ -4,7 +4,7 @@
 // need to get rails3 working with jquery, I remember some alternatve file you can get
 // since default is silly prototype
 $(function() {
-    drawBlockBorders();
+    drawBlockBorders($('#board'));
 
     $('#init').click(function(){
         // may need to get forms.js plugin
@@ -21,19 +21,32 @@ $(function() {
                 }
             }
         })
+
+        $('#start').hide();
+        $('#help').show();
     });
 
     //need to fiure out how to change this whenever changes or clicked if that's possible?
     // like as soon as you with change the number if it regresses to text or on click if it's on an arrow?'
     $('#dimensions input').change(function(e) {
         var $board = $('#board')
-        // adjust the board as neded
-        modBoard($board,
-                 {w: $board.find('tr:first td').length,
-                  h: $board.find('tr').length });
+        // remove block borders
+        removeBlockBorders($board);
+
+        // adjust the board as needed
+        modBoard($board);
 
         //redraw borders
-        drawBlockBorders();
+        drawBlockBorders($board);
+    });
+
+    $('#res').click(function() {
+       // clear anything that had an error
+       $('input.error').removeClass();
+       $('input:disabled').removeAttr('disabled');
+       // TODO: how to change the table dimensions! oh could look at value of width probably?
+       $('#start').show();
+       $('#help').hide();
     });
 });
 
@@ -56,38 +69,25 @@ function validMove ($board,$pos) {
 
     return valid
 }
+function removeBlockBorders($board) {
+    var height = Math.sqrt($board.find('tr').length);
+    var width = Math.sqrt($board.find('tr:first td').length);
 
+    $board.find('tr:nth-child(' + height + 'n+1)').removeAttr('class');
+    $board.find('tr td:nth-child(' + width + 'n+1)').removeAttr('class');
+}
 /*@brief can be used to draw block borders on #board
  *
  *  will be more general purpose later where you can use it like any jquery function
  */
  //TODO: way to do this with straight css? perhaps look at nth or eq filters
 
-function drawBlockBorders() {
-    var $board = $('#board');
+function drawBlockBorders($board) {
     var height = $('#height').val();
     var width = $('#width').val();
 
-    //NOTE: consider removing td/tr borders or how to start fresh
-
-    // no idea how to do this right now but needed to make easier to see blocks
-    // could maybe do it in rails if this was an ajax call
-    // or maybe add the position of a td to it's class? just seems messy
-    $board.find('tr').each(function(i){
-        if (i % height === 0) {
-            $(this).addClass('grid')
-        } else {
-            $(this).removeClass('grid');
-        }
-
-        $(this).children('td').each(function(i){
-            if (i % width === 0) {
-                $(this).addClass('grid')
-            } else {
-                $(this).removeClass('grid');
-            }
-        })
-    })
+    $board.find('tr:nth-child(' + height + 'n+1)').addClass('grid');
+    $board.find('tr td:nth-child(' + width + 'n+1)').addClass('grid');
 }
 
 function maxVal() {
@@ -96,12 +96,14 @@ function maxVal() {
 
 /*@brief add or remove from board to match height and width values
  *
- *  @param $board   jquery object of board
+ *  @param $board   jquery object of board (a table)
  *  @param dim      object with propperties w for width and h for height
  */
-function modBoard($board,dim) {
+function modBoard($board) {
     var textToInsert = '';
     var max = maxVal();
+    var dim = {w: $board.find('tr:first td').length,
+               h: $board.find('tr').length }
 
     // TODO: look at various js string multiplication methods
     if (dim.w < max){

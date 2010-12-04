@@ -1,17 +1,23 @@
 %h1 Sudoku on Rails... you're new best friend
 %section
     %h1 -Your Game Board-
-    %table#board
-        -for y in 1..9
-            %tr
-                -for x in 1..9
-                    %td
-                        %input{ :type=>'text' }
+    %form
+        %table#board
+            -for y in 1..9
+                %tr
+                    -for x in 1..9
+                        %td
+                            %input{ :type=>'text' }
 
-%section#controls
-    #dimensions
-        %input#width{ :type=>'number', :min => 2, :max => 5, :value => 3}
-        x
-        %input#height{ :type=>'number', :min => 2, :max => 5, :value => 3}
-    %input#init{ :type=>'button', :value=>'Initialize' }
+        %span#start
+            %input#init{ :type=>'button', :value=>'Initialize' }
+            %span#dimensions
+                %input#width{ :type=>'number', :min => 2, :max => 5, :value => 3}
+                x
+                %input#height{ :type=>'number', :min => 2, :max => 5, :value => 3}
+        %span#help
+            %input{ :type=>'button', :name=>'hint', :value=>'Hint' }
+            %input{ :type=>'button', :name=>'check', :value=>'Check' }
+            %input{ :type=>'button', :name=>'solve', :value=>'Solve' }
+        %input#res{ :type=>'reset', :name=>'resetbtn', :value=>'Reset' }
 
