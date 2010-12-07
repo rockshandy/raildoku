@@ -42,14 +42,63 @@ module ConstraintSudoku
    	return [board, open]
   end
 
-  # fixes an element, this is only called for initial input
+
+# validate function, also to do,  have localsearch return the time as a struct passbakc via hash
+  def validate(board, xblks, yblks)
+     # row in valid
+    
+  	for x in 0..board.length-1
+    		col = Array.new
+ 		row = Array.new(board[x]) #need new array not modify board via reference	
+		block = Array.new(board.length) {Array.new}
+    		for y in 0..board.length-1
+                        if (board[y][x] != 0)
+				
+      				col.concat([board[y][x]]) 
+			end
+
+			puts [y, x]
+ 			puts ""
+			if (board[x][y] != 0)
+ 				blk = (x/xblks + yblks * y/yblks).floor
+
+				block[blk-1].concat([board[x][y]]) 
+			end
+   	 	end
+		row.delete(0)
+                 
+    		if (col.uniq! != nil or row.uniq! != nil) 
+		
+			
+			return false
+		end
+		
+
+  	end
+        
+        for each in block
+		if each.uniq! != nil
+			return false
+		end
+	end 
+	return true
+   end
+
+
+
+  
+
+
+     
+
+  # fixes an element, this is only called for initial input   
   # or assignments that are deduced with 100% certainty through constraint propogation
   # This function is the key that leads to node-consistent boards by default
   def assign_spot(board,open, x, y,val, xblks, yblks)
     open.delete([x,y])
     board[x][y] = val
     for position in open
-	    # the last part of this is is checking blocks  mapping of x,y -> blk = x/xblks + y*(y/yblks)  using integer division
+	    # the last part of this is is checking blocks  mapping of x,y -> blk = x/xblks + yblks*(y/yblks)  using integer division
 	    if (position[0] == x or position[1] == y or    (position[0]/xblks +yblks*(position[1]/yblks) == x/xblks + yblks*(y/yblks)  ) )
 		    #This segment is a little tricky and deserves further explanation:
 		    #This function is called when you are assign a value to a cell
