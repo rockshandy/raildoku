@@ -821,7 +821,9 @@ require 'constraint_sudoku.rb'
 
 	yblks = 3
 	xblks = 2
+	# xblks and yblks are reverse of what you'd expect
 
+	# order must be xblks, yblks
         myhash = localSearch(create_node_consistent_board(board,yblks,xblks)[0],xblks, yblks,'mostHighlyConstrainedVariableWithLeastConstrainingValue', 60*15)
 	
 	#myhashlocalSearch(create_node_consistent_board(board,xblks,yblks)[0],xblks, yblks,'mostHighlyConstrainedVariableWithLeastConstrainingValue', 15*60);
