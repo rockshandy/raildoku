@@ -1,9 +1,11 @@
 require 'constraint_sudoku.rb'
-module LocalSearch
-  include ConstraintSudoku
-  def woo
-    'just a looky loo'
-  end
+	module LocalSearch
+	  include ConstraintSudoku
+	  def woo
+	    'just a looky loo'
+	  end
+	
+	
 	#	Function: uniqueLocalCells
 	#
 	#	Determines the unique local cells who will be in contention for the specified's cells possible value.
@@ -13,18 +15,22 @@ module LocalSearch
 	#		board           : the board to evaluate
 	#		x               : the x position of the cell to evaluate
 	#		y               : the y position of the cell to evaluate
+	#		xblks			: ???the count of x blocks???
+	#		yblks			: ???the count of y blocks???
 	#	Returns: The unique cells in the collumn, row and block group.
-	def uniqueLocalCells(board, x, y)
+	def uniqueLocalCells(board, x, y, xblks, yblks)
 		cells=Array.new();
 	
 	
 		#collumn cells
 		for posY in 0...board[0].length()
 			cellUniqueness=true;
-			cells.each do |currentCell|
-				if currentCell[:x]==x and currentCell[:y]==posY
-					cellUniqueness=false;
-					break;
+			if cells.length()>0
+				cells.each do |currentCell|
+					if currentCell[:x]==x and currentCell[:y]==posY
+						cellUniqueness=false;
+						#break;
+					end
 				end
 			end
 			if cellUniqueness#add it if it is unique
@@ -41,10 +47,12 @@ module LocalSearch
 		#row cells
 		for posX in 0...board.length()
 			cellUniqueness=true;
-			cells.each do |currentCell|
-				if currentCell[:x]==posX and currentCell[:y]==y
-					cellUniqueness=false;
-					break;
+			if cells.length()>0
+				cells.each do |currentCell|
+					if currentCell[:x]==posX and currentCell[:y]==y
+						cellUniqueness=false;
+						#break;
+					end
 				end
 			end
 			if cellUniqueness#add it if it is unique
@@ -61,31 +69,35 @@ module LocalSearch
 		#block group cells
 	
 		#TODO: figure out size of block groups in general (square root of width and height?) and finish this section
-		blockXsize=Math.sqrt(board.length());
-		blockYsize=Math.sqrt(board[0].length());
-		blockXnumber=(x/blockXsize).floor;
-		blockYnumber=(y/blockYsize).floor;
-		xStartingPos=(blockXnumber*blockXsize).floor;#index starts at 0
-		yStartingPos=(blockYnumber*blockYsize).floor;
+		#blockXsize=Math.sqrt(board.length());
+		#blockYsize=Math.sqrt(board[0].length());
+		blockXsize=(board.length()/xblks).floor();
+		blockYsize=(board[0].length()/yblks).floor();
+		blockXnumber=(x/blockXsize).floor();
+		blockYnumber=(y/blockYsize).floor();
+		xStartingPos=(blockXnumber*blockXsize).floor();#index starts at 0
+		yStartingPos=(blockYnumber*blockYsize).floor();
 	
-		for posX in xStartingPos...xStartingPos+blockXsize
-			for posY in yStartingPos...yStartingPos+blockYsize
+		for posX in xStartingPos...(xStartingPos+blockXsize)
+			for posY in yStartingPos...(yStartingPos+blockYsize)
 				cellUniqueness=true;
-				cells.each do |currentCell|
-					if currentCell[:x]==posX and currentCell[:y]==posY
-						cellUniqueness=false;
-						break;
+				if cells.length()>0
+					cells.each do |currentCell|
+						if currentCell[:x]==posX and currentCell[:y]==posY
+							cellUniqueness=false;
+							#break;
+						end
 					end
 				end
 				if cellUniqueness#add it if it is unique
-				newCellEntry=Array.new(1);
-				if board[posX][posY].is_a?(Array)
-					newCellEntry[0]={:x=>posX, :y=>posY, :values=>board[posX][posY].dup()};
-				else
-					newCellEntry[0]={:x=>posX, :y=>posY, :values=>board[posX][posY]};
+					newCellEntry=Array.new();
+					if board[posX][posY].is_a?(Array)
+						newCellEntry[0]={:x=>posX, :y=>posY, :values=>board[posX][posY].dup()};
+					else
+						newCellEntry[0]={:x=>posX, :y=>posY, :values=>board[posX][posY]};
+					end
+					cells.concat(newCellEntry);
 				end
-				cells.concat(newCellEntry);
-			end
 			end
 		end
 		return cells;
@@ -116,17 +128,20 @@ module LocalSearch
 	#		x               : the x position of the cell to evaluate
 	#		y               : the y position of the cell to evaluate
 	#		valueToEvaluate : the value to attempt to substitute in order to determe the number of conflicting cells
+	#		xblks			: ???the count of x blocks???
+	#		yblks			: ???the count of y blocks???
 	#	Returns: The number of cells conflicting with this attribute assignment.
-	def numConflicts(board, x, y, valueToEvaluate)
+	def numConflicts(board, x, y, valueToEvaluate, xblks, yblks)
 		number=0;
-		uniqueLocalCells(board,x,y).each{|currentCell|
+		uniqueLocalCells(board,x,y, xblks, yblks).each{|currentCell|
 			if currentCell[:values].is_a?(Array)
 				if currentCell[:values].include?(valueToEvaluate)
 					number=number+1;
 				end
 			else
 				if currentCell[:values]==valueToEvaluate
-					number=number+1;
+					#number=number+1;
+					number=board.length()*board[0].length();
 				end
 			end
 		}
@@ -158,10 +173,12 @@ module LocalSearch
 	#		board           : the board to evaluate
 	#		x               : the x position of the cell to evaluate
 	#		y               : the y position of the cell to evaluate
+	#		xblks			: ???the count of x blocks???
+	#		yblks			: ???the count of y blocks???
 	#	Returns: The degree of the cell.
-	def degree(board, x, y)
+	def degree(board, x, y, xblks, yblks)
 		number=0;
-		uniqueLocalCells(board,x,y).each{|currentCell|
+		uniqueLocalCells(board,x,y, xblks, yblks).each{|currentCell|
 			if currentCell[:values].is_a?(Array) and currentCell[:values].length()>1
 				number=number+1;
 			end
@@ -193,12 +210,14 @@ module LocalSearch
 	#		board           : the board to evaluate
 	#		x               : the x position of the cell to evaluate
 	#		y               : the y position of the cell to evaluate
+	#		xblks			: ???the count of x blocks???
+	#		yblks			: ???the count of y blocks???
 	#	Returns: The least constraining value for the given cell.
-	def leastConstrainingValue(board, x, y)
-		leastConstraining={:value=>board[x][y][0],:heuristicValue=>numConflicts(board,x,y,board[x][y][0])}#initially asign least constraining value to first element possible
+	def leastConstrainingValue(board, x, y, xblks, yblks)
+		leastConstraining={:value=>board[x][y][0],:heuristicValue=>numConflicts(board,x,y,board[x][y][0], xblks, yblks)}#initially asign least constraining value to first element possible
 		if board[x][y].is_a?(Array)
 			board[x][y].each{|possibleValue|
-				currentHeuristic=numConflicts(board,x,y,possibleValue);
+				currentHeuristic=numConflicts(board,x,y,possibleValue, xblks, yblks);
 				if currentHeuristic<leastConstraining[:heuristicValue]
 					leastConstraining[:value]=possibleValue;
 					leastConstraining[:heuristicValue]=currentHeuristic;
@@ -350,6 +369,8 @@ module LocalSearch
 	#
 	#	Input:
 	#		queue           : the queue to evaluate
+	#		xblks			: ???the count of x blocks???
+	#		yblks			: ???the count of y blocks???
 	#	Returns: Updated copy of the queue without bad boards.
 	def cullBadBoards(queue, xblks, yblks)
 		badBoards=Array.new();
@@ -375,57 +396,60 @@ module LocalSearch
 			if boardHash==false
 				goodBoard=false;
 			
-			end
-			board.each{|row|
-				row.each{|cell|
-					if cell.is_a?(Array)
-						if cell.length==0#this is a bad board because this cell has 0 possibilities
-							goodBoard=false;
-							break;
+			elsif
+				board.each{|row|
+					row.each{|cell|
+						if cell.is_a?(Array)
+							if cell.length==0#this is a bad board because this cell has 0 possibilities
+								goodBoard=false;
+								#break;
+							end
 						end
-					end
-					if cell==nil
-						goodBoard=false;
+						if cell==nil
+							goodBoard=false;
 			
-					end
+						end
+					}
+			
 				}
-			
-			}
-			if !goodBoard==false
+			end
+			if goodBoard
 				for row in 0...board.length()
-					for collumn in 0...board[0].length()
-						if !board[row][collumn].is_a?(Array)
-							uniqueLocalCells(board,row,collumn).each{|cellToComp|
+					if goodBoard
+						for collumn in 0...board[0].length()
+							if !board[row][collumn].is_a?(Array)
+								uniqueLocalCells(board,row,collumn, xblks, yblks).each{|cellToComp|
 						
-								if !(cellToComp[:values].is_a?(Array)) and cellToComp[:values]==board[row][collumn] and
-								!(cellToComp[:x]==row and cellToComp[:y]==collumn)
+									if !(cellToComp[:values].is_a?(Array)) and cellToComp[:values]==board[row][collumn] and
+									!(cellToComp[:x]==row and cellToComp[:y]==collumn)
 						
-									goodBoard=false
+										goodBoard=false
 								
-								elsif cellToComp[:values].is_a?(Array) and cellToComp.length()==1 and
-									cellToComp[:values][0]==board[row][collumn] and !(cellToComp[:x]==row and 
-									cellToComp[:y]==collumn)
+									elsif cellToComp[:values].is_a?(Array) and cellToComp.length()==1 and
+										cellToComp[:values][0]==board[row][collumn] and !(cellToComp[:x]==row and 
+										cellToComp[:y]==collumn)
+								
+											goodBoard=false
+								
+									end
+								}
+							elsif board[row][collumn].length()==1
+								uniqueLocalCells(board,row,collumn, xblks, yblks).each{|cellToComp|
+						
+									if !(cellToComp[:values].is_a?(Array)) and cellToComp[:values]==board[row][collumn][0] and 
+									!(cellToComp[:x]==row and cellToComp[:y]==collumn)
 								
 										goodBoard=false
 								
-								end
-							}
-						elsif board[row][collumn].length()==1
-							uniqueLocalCells(board,row,collumn).each{|cellToComp|
-						
-								if !(cellToComp[:values].is_a?(Array)) and cellToComp[:values]==board[row][collumn][0] and 
-								   !(cellToComp[:x]==row and cellToComp[:y]==collumn)
+									elsif cellToComp[:values].is_a?(Array) and cellToComp.length()==1 and 
+										cellToComp[:values][0]==board[row][collumn][0] and !(cellToComp[:x]==row and 
+										cellToComp[:y]==collumn)
 								
-									goodBoard=false
+											goodBoard=false
 								
-								elsif cellToComp[:values].is_a?(Array) and cellToComp.length()==1 and 
-									cellToComp[:values][0]==board[row][collumn][0] and !(cellToComp[:x]==row and 
-									cellToComp[:y]==collumn)
-								
-										goodBoard=false
-								
-								end
-							}
+									end
+								}
+							end
 						end
 					end
 				end
@@ -470,8 +494,10 @@ module LocalSearch
 	#
 	#	Input:
 	#		board           : the board to evaluate
+	#		xblks			: ???the count of x blocks???
+	#		yblks			: ???the count of y blocks???
 	#	Returns: The board fulfilling this heuristic.
-	def minConflicts(board)
+	def minConflicts(board, xblks, yblks)
 		if board[0][0].is_a?(Array)
 			bestCell={:x=>0,:y=>0,:value=>board[0][0][0],:heuristicEvaluation=>numConflicts(board,0,0,board[0][0][0])};#first cell is currently the best option
 		else
@@ -482,7 +508,7 @@ module LocalSearch
 			for collumn in 0...board[0].length()
 				if board[row][collumn].is_a?(Array) and board[row][collumn].length()>1
 					board[row][collumn].each{|possibleValue|
-						evaluatedHeuristic=numConflicts(board,row,collumn,possibleValue);
+						evaluatedHeuristic=numConflicts(board,row,collumn,possibleValue, xblks, yblks);
 						if evaluatedHeuristic<bestCell[:heuristicEvaluation]#new value is lower so its now the best
 							bestCell[:x]=row;
 							bestCell[:y]=collumn;
@@ -505,7 +531,7 @@ module LocalSearch
 					newBoard[row][collumn]=board[row][collumn];
 				end
 			end
-		en
+		end
 		#newBoard=board.dup();
 		newBoard[bestCell[:x]][bestCell[:y]]=bestCell[:value];
 		return newBoard;#below not run
@@ -538,8 +564,10 @@ module LocalSearch
 	#
 	#	Input:
 	#		board           : the board to evaluate
+	#		xblks			: ???the count of x blocks???
+	#		yblks			: ???the count of y blocks???
 	#	Returns: The board fulfilling this heuristic.
-	def mostHighlyConstrainedVariableWithLeastConstrainingValue(board)
+	def mostHighlyConstrainedVariableWithLeastConstrainingValue(board, xblks, yblks)
 		if board[0][0].is_a?(Array)
 			mostConstrained={:degreeValue=>degree(board,0,0),:x=>0,:y=>0}#default first cell as most constrained
 		else#already assigned a value
@@ -548,7 +576,7 @@ module LocalSearch
 		for row in 0...board.length()
 			for collumn in 0...board[0].length()
 				if board[row][collumn].is_a?(Array) and board[row][collumn].length()>1
-					evaluatedHeuristic=degree(board,row,collumn)
+					evaluatedHeuristic=degree(board,row,collumn, xblks, yblks)
 					if evaluatedHeuristic>mostConstrained[:degreeValue]#its more constrained
 						mostConstrained[:degreeValue]=evaluatedHeuristic;
 						mostConstrained[:x]=row;
@@ -572,7 +600,7 @@ module LocalSearch
 		end
 	
 		#newBoard=board.dup();
-		newBoard[mostConstrained[:x]][mostConstrained[:y]]=leastConstrainingValue(board,mostConstrained[:x],mostConstrained[:y]);
+		newBoard[mostConstrained[:x]][mostConstrained[:y]]=leastConstrainingValue(board,mostConstrained[:x],mostConstrained[:y], xblks, yblks);
 		return newBoard;
 	end
 
@@ -601,10 +629,13 @@ module LocalSearch
 	#	This function is assisted by [cullBadBoards] , [{heuristic}] , and [enqueueBoard].
 	#
 	#	Input:
-	#		board           : the board to evaluate, xblk and yblk values
+	#		board           : the board to evaluate
 	#		heuristic       : the heuristic to use when searching
+	#		xblks			: ???the count of x blocks???
+	#		yblks			: ???the count of y blocks???
 	#	Returns: Search generated solved board.
-	def localSearch(board,heuristic, xblks, yblks)
+	def localSearch(board, xblks, yblks,heuristic='mostHighlyConstrainedVariableWithLeastConstrainingValue')
+                starttime = Time.now
 		solutionFound=false;
 		queue=Array.new(1,board);
 		checkBoard=Array.new()
@@ -629,13 +660,16 @@ module LocalSearch
 		end
 	
 		while !solutionFound
+                        if (Time.now -starttime >  60* 15 )
+                               return false;
+                         end
 
 			if heuristic=~/mostHighlyConstrainedVariableWithLeastConstrainingValue/
-				newBoard=mostHighlyConstrainedVariableWithLeastConstrainingValue(queue[0]);
+				newBoard=mostHighlyConstrainedVariableWithLeastConstrainingValue(queue[0], xblks, yblks);
 			end
 
 			if heuristic=~/minConflicts/
-				newBoard=minConflicts(queue[0]);
+				newBoard=minConflicts(queue[0], xblks, yblks);
 			end
 
 			queue=enqueueBoard(newBoard,queue);
@@ -671,9 +705,13 @@ module LocalSearch
 					queue=updatedQueue.concat(popBoard(queue));#pull off the copy used to modify the old board's possibilities
 				end
 			
-				p "queue length"
+				#p "queue length"
 				p queue.length();
-				print_board(queue[0]);
+				#print_board(queue[0]);
+			else
+				#p "not added"
+				#print_board(queue[0]);
+				
 			end
 
 			#remove possible entries for create_node_consistent_board's re-evaluation
@@ -713,7 +751,7 @@ module LocalSearch
 				end
 				if queue.length==0
 					puts "No Solution"
-					exit(0);
+					return false;
 				end
 			
 			end
@@ -746,28 +784,29 @@ module LocalSearch
 	#print_board(localSearch(create_node_consistent_board(board,Math.sqrt(board.length).floor,Math.sqrt(board[0].length).floor)[0],'minConflicts'));##mostHighlyConstrainedVariableWithLeastConstrainingValue
 
 	#sample boards for now until we can generate from rails app:
-	def example
-
 	#board = [ [9,0,0,4,0,0,6,0,0], [0,0,7,0,0,0,0,0,3], [0,0,0,1,2,0,0,0,0], [1,2,0,0,4,3,0,5,0],
 	#   [7,0,0,0,0,0,0,0,4], [0,4,0,7,6,0,0,8,9], [0,0,0,0,7,1,0,0,0], [6,0,0,0,0,0,9,0,0], [0,0,4,0,0,8,0,0,2]];
 
 
 	# GLOBAL section for now,  this is where rails app will take over:
-
+    def example
 	#board = [[1,9,0,0,6,0,7,0,8], [0,0,0,0,0,7,0,0,5], [7,0,0,2,3,0,0,0,0], [0,1,0,0,0,0,5,0,0], [3,0,6,0,0,0,4,0,9], [0,0,9,0,0,0,0,7,0],
-	#          [0,0,0,0,1,5,0,0,3], [5,0,0,9,0,0,0,0,0], [9,0,3,0,7,0,0,5,2]]
+		#  [0,0,0,0,1,5,0,0,3], [5,0,0,9,0,0,0,0,0], [9,0,3,0,7,0,0,5,2]]
 
 
 
-board =  [[1,0,0,0,0,2], [5,0,1,2,0,4], [3,2,0,0,1,5], [0,5,0,1,2,6], [2,0,0,5,0,1], [0,1,0,0,5,3]]
+	#board =  [[1,0,0,0,0,2], [5,0,1,2,0,4], [3,2,0,0,1,5], [0,5,0,1,2,6], [2,0,0,5,0,1], [0,1,0,0,5,3]]
 
-#board = [[4,0,2,1,6,5], [6,5,0,4,0,0], [0,1,5,6,4,3], [3,6,1,2,5,4], [0,2,4,0,1,6], [1,4,6,5,3,0]]
+	board = [[4,0,2,1,6,5], [6,5,0,4,0,0], [0,1,5,6,4,3], [3,6,1,2,5,4], [0,2,4,0,1,6], [1,4,6,5,3,0]]
 
-xblks = 3
-yblks = 2
+	xblks = 3
+	yblks = 2
+	#yblks = 2
 
-print_board (localSearch(create_node_consistent_board(board,xblks,yblks)[0],'minConflicts', xblks, yblks));
+	
+	print_board (localSearch(create_node_consistent_board(board,xblks,yblks)[0],xblks, yblks,'minConflicts'));
+
+    end
 end
 
-end
 
