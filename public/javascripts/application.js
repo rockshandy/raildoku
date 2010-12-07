@@ -5,6 +5,7 @@
 // since default is silly prototype
 $(function() {
     drawBlockBorders($('#board'));
+    failed = false;
 
     $('#init').click(function(){
         // may need to get forms.js plugin
@@ -18,9 +19,12 @@ $(function() {
                 } else {
                     // shade in error
                     $(this).addClass('error')
+                    failed = true
                 }
             }
         })
+
+        if (failed) {return false};
 
         $('#start').hide();
         $('#help').show();
@@ -48,6 +52,15 @@ $(function() {
        $('#start').show();
        $('#help').hide();
     });
+
+    $('form').submit(function(){
+        data = ''
+        // convert all inputs to a comma seperated list
+        $('#board td').each(function(){
+            data += ($(this).val() || '0') + ','
+        });
+        $('form #board_value').val(data)
+    })
 });
 
 /*@brief validate a position on the sudoku board

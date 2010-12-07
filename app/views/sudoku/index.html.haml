@@ -1,16 +1,17 @@
 %h1 Sudoku on Rails... you're new best friend
 %section
     %h1 -Your Game Board-
-    %form
+    =form_for :board, :url => 'init', :remote => true do |f|
         %table#board
             -for y in 1..9
                 %tr
                     -for x in 1..9
                         %td
                             %input{ :type=>'text', :size=>'1' }
+        =f.hidden_field(:value)
 
         %span#start
-            %input#init{ :type=>'button', :value=>'Initialize' }
+            %input#init{ :type=>'submit', :name=>'init', :value=>'Initialize' }
             %span#dimensions
                 %input#width{ :type=>'number', :min => 2, :max => 5, :value => 3}
                 x

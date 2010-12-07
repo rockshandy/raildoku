@@ -5,23 +5,20 @@ module ConstraintSudoku
 
   #prints the sudoku board
   def print_board(board)
-      puts "PRINTING BOARD- START"
-      puts
-    puts
-      if (board == false)
-    #	puts "INVALID SUDOKU BOARD... check input"
+    puts "PRINTING BOARD- START\n\n"
+    #TODO: ask steve wtf
+    if (board == false)
+      #	puts "INVALID SUDOKU BOARD... check input"
 	    return
     end
 
     for x in 0..board.length-1
    		for y in 0..board.length-1
             print board[x][y] ,    "  | "
-           end
-      puts
       end
-   	puts
-    puts
-      puts "PRINTING BOARD END"
+      puts
+    end
+    puts "\n\nPRINTING BOARD END"
   end
 
   # if any values have just one potential, assign it and remove it from a constraint
