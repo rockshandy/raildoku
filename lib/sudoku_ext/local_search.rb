@@ -1,11 +1,35 @@
 require 'constraint_sudoku.rb'
 	module LocalSearch
 	  include ConstraintSudoku
-	  def woo
-	    'just a looky loo'
-	  end
-	
-	
+
+	  # brief - solves a sudoku board
+	  #
+	  # input
+	  #   board - a fresh board, an array or rows (also an array)
+	  #   options - a hash or options to pass which can contain:
+	  #             xblks - number of blocks accross the board contains
+	  #             yblks - number of blocks up and down the board contains
+	  #             hueristic - function to use to pick a value to fill in a board spot
+	  #             time_limit - time to try and solve sudoku
+	  def solve_sudoku(board,options)
+      #defaults
+      options[:xblks] ||= 3
+      options[:yblks] ||= 3
+      options[:heuristic] ||= 'mostHighlyConstrainedVariableWithLeastConstrainingValue'
+      options[:time_limit] ||= 60 * 15
+
+      puts options.values
+
+      # constrain that board
+      const = create_node_consistent_board(board, options[:xblks], options[:yblks])
+
+      return {:board=>false,:error=>'Board is invalid'} unless const
+
+      return localSearch(const[0], options[:xblks], options[:yblks],
+                  options[:heuristic]) #,
+                  #options[:time_limit])
+    end
+
 	#	Function: uniqueLocalCells
 	#
 	#	Determines the unique local cells who will be in contention for the specified's cells possible value.
@@ -20,8 +44,8 @@ require 'constraint_sudoku.rb'
 	#	Returns: The unique cells in the collumn, row and block group.
 	def uniqueLocalCells(board, x, y, xblks, yblks)
 		cells=Array.new();
-	
-	
+
+
 		#collumn cells
 		for posY in 0...board[0].length()
 			cellUniqueness=true;
@@ -43,7 +67,7 @@ require 'constraint_sudoku.rb'
 				cells.concat(newCellEntry);
 			end
 		end
-	
+
 		#row cells
 		for posX in 0...board.length()
 			cellUniqueness=true;
@@ -65,9 +89,9 @@ require 'constraint_sudoku.rb'
 				cells.concat(newCellEntry);
 			end
 		end
-	
+
 		#block group cells
-	
+
 		#TODO: figure out size of block groups in general (square root of width and height?) and finish this section
 		#blockXsize=Math.sqrt(board.length());
 		#blockYsize=Math.sqrt(board[0].length());
@@ -77,7 +101,7 @@ require 'constraint_sudoku.rb'
 		blockYnumber=(y/blockYsize).floor();
 		xStartingPos=(blockXnumber*blockXsize).floor();#index starts at 0
 		yStartingPos=(blockYnumber*blockYsize).floor();
-	
+
 		for posX in xStartingPos...(xStartingPos+blockXsize)
 			for posY in yStartingPos...(yStartingPos+blockYsize)
 				cellUniqueness=true;
@@ -392,10 +416,10 @@ require 'constraint_sudoku.rb'
 				end
 			end
 			boardHash=create_node_consistent_board(checkBoard,xblks,yblks)
-		
+
 			if boardHash==false
 				goodBoard=false;
-			
+
 			elsif
 				board.each{|row|
 					row.each{|cell|
@@ -407,10 +431,10 @@ require 'constraint_sudoku.rb'
 						end
 						if cell==nil
 							goodBoard=false;
-			
+
 						end
 					}
-			
+
 				}
 			end
 			if goodBoard
@@ -419,34 +443,34 @@ require 'constraint_sudoku.rb'
 						for collumn in 0...board[0].length()
 							if !board[row][collumn].is_a?(Array)
 								uniqueLocalCells(board,row,collumn, xblks, yblks).each{|cellToComp|
-						
+
 									if !(cellToComp[:values].is_a?(Array)) and cellToComp[:values]==board[row][collumn] and
 									!(cellToComp[:x]==row and cellToComp[:y]==collumn)
-						
+
 										goodBoard=false
-								
+
 									elsif cellToComp[:values].is_a?(Array) and cellToComp.length()==1 and
-										cellToComp[:values][0]==board[row][collumn] and !(cellToComp[:x]==row and 
+										cellToComp[:values][0]==board[row][collumn] and !(cellToComp[:x]==row and
 										cellToComp[:y]==collumn)
-								
+
 											goodBoard=false
-								
+
 									end
 								}
 							elsif board[row][collumn].length()==1
 								uniqueLocalCells(board,row,collumn, xblks, yblks).each{|cellToComp|
-						
-									if !(cellToComp[:values].is_a?(Array)) and cellToComp[:values]==board[row][collumn][0] and 
+
+									if !(cellToComp[:values].is_a?(Array)) and cellToComp[:values]==board[row][collumn][0] and
 									!(cellToComp[:x]==row and cellToComp[:y]==collumn)
-								
+
 										goodBoard=false
-								
-									elsif cellToComp[:values].is_a?(Array) and cellToComp.length()==1 and 
-										cellToComp[:values][0]==board[row][collumn][0] and !(cellToComp[:x]==row and 
+
+									elsif cellToComp[:values].is_a?(Array) and cellToComp.length()==1 and
+										cellToComp[:values][0]==board[row][collumn][0] and !(cellToComp[:x]==row and
 										cellToComp[:y]==collumn)
-								
+
 											goodBoard=false
-								
+
 									end
 								}
 							end
@@ -459,7 +483,7 @@ require 'constraint_sudoku.rb'
 				badBoards.concat(newBadEntry);
 			end
 		}
-	
+
 		return (queue-badBoards);
 	end
 
@@ -503,7 +527,7 @@ require 'constraint_sudoku.rb'
 		else
 			bestCell={:x=>0,:y=>0,:heuristicEvaluation=>board[0].length()*board.length()+1};#this cell already has a value so set it as the current best one with a conflict value greater than a completly unassigned cell grouping(the count of the entire board +1 is greater than any possible minConflicts value)
 		end
-	
+
 		for row in 0...board.length()
 			for collumn in 0...board[0].length()
 				if board[row][collumn].is_a?(Array) and board[row][collumn].length()>1
@@ -519,7 +543,7 @@ require 'constraint_sudoku.rb'
 				end
 			end
 		end
-	
+
 		#assigning best value to board
 		newBoard=Array.new(board.length());
 		for row in 0...board.length()
@@ -569,7 +593,7 @@ require 'constraint_sudoku.rb'
 	#	Returns: The board fulfilling this heuristic.
 	def mostHighlyConstrainedVariableWithLeastConstrainingValue(board, xblks, yblks)
 		if board[0][0].is_a?(Array)
-			mostConstrained={:degreeValue=>degree(board,0,0),:x=>0,:y=>0}#default first cell as most constrained
+			mostConstrained={:degreeValue=>degree(board,0,0,xblks,yblks),:x=>0,:y=>0}#default first cell as most constrained
 		else#already assigned a value
 			mostConstrained={:degreeValue=>0,:x=>0,:y=>0}#default first cell as degree of 0 so anything else will be more constrained
 		end
@@ -585,7 +609,7 @@ require 'constraint_sudoku.rb'
 				end
 			end
 		end
-	
+
 		#assigning best value to board
 		newBoard=Array.new(board.length());
 		for row in 0...board.length()
@@ -598,7 +622,7 @@ require 'constraint_sudoku.rb'
 				end
 			end
 		end
-	
+
 		#newBoard=board.dup();
 		newBoard[mostConstrained[:x]][mostConstrained[:y]]=leastConstrainingValue(board,mostConstrained[:x],mostConstrained[:y], xblks, yblks);
 		return newBoard;
@@ -635,7 +659,8 @@ require 'constraint_sudoku.rb'
 	#		yblks			: ???the count of y blocks???
 	#	Returns: Search generated solved board.
 	def localSearch(board, xblks, yblks,heuristic='mostHighlyConstrainedVariableWithLeastConstrainingValue')
-                starttime = Time.now
+
+    starttime = Time.now
 		solutionFound=false;
 		queue=Array.new(1,board);
 		checkBoard=Array.new()
@@ -650,17 +675,17 @@ require 'constraint_sudoku.rb'
 				end
 			end
 		end
-	
+
 	 	#create_node_consistent_board[1] represents the openlist
 		if (create_node_consistent_board(checkBoard,xblks,yblks)[1].empty?)
 			solutionFound=true;
 		else
 			queue=Array.new(1,create_node_consistent_board(checkBoard,xblks,yblks)[0])
-	
+
 		end
-	
+
 		while !solutionFound
-                        if (Time.now -starttime >  60* 15 )
+                        if (Time.now - starttime >  60* 15 )
                                return false;
                          end
 
@@ -674,13 +699,13 @@ require 'constraint_sudoku.rb'
 
 			queue=enqueueBoard(newBoard,queue);
 			queue=cullBadBoards(queue, xblks, yblks);
-		
+
 			if queue.include?(newBoard)#if its a valid board re-add it now that the last board's possibilities have been updated
 				#remove possible entries for create_node_consistent_board's re-evaluation
 				for row in 0...newBoard.length()
 					for collumn in 0...newBoard[0].length()
 						if newBoard[row][collumn].is_a?(Array)#if it hasn't been assigned a value
-							newBoard[row][collumn]=0;#do not assign right now to keep track of changes			
+							newBoard[row][collumn]=0;#do not assign right now to keep track of changes
 						else
 							newBoard[row][collumn]=newBoard[row][collumn];
 						end
@@ -689,12 +714,12 @@ require 'constraint_sudoku.rb'
 
 				#generate new board
 				myboardHash=create_node_consistent_board(newBoard,xblks.floor,yblks);
-			
+
 				if myboardHash!=false
 					for row in 0...myboardHash[0].length()
 						for collumn in 0...myboardHash[0][0].length()
 
-							if myboardHash[0][row][collumn].is_a?(Array) and queue[1][row][collumn].is_a?(Array) and 
+							if myboardHash[0][row][collumn].is_a?(Array) and queue[1][row][collumn].is_a?(Array) and
 							   myboardHash[0][row][collumn].length()>queue[1][row][collumn].length()
 
 								myboardHash[0][row][collumn]=queue[1][row][collumn].dup();
@@ -704,14 +729,14 @@ require 'constraint_sudoku.rb'
 					updatedQueue=Array.new(1,myboardHash[0]);
 					queue=updatedQueue.concat(popBoard(queue));#pull off the copy used to modify the old board's possibilities
 				end
-			
+
 				#p "queue length"
 				p queue.length();
 				#print_board(queue[0]);
 			else
 				#p "not added"
 				#print_board(queue[0]);
-				
+
 			end
 
 			#remove possible entries for create_node_consistent_board's re-evaluation
@@ -722,28 +747,28 @@ require 'constraint_sudoku.rb'
 					if queue[0][row][collumn].is_a?(Array)#if it hasn't been assigned a value
 						checkBoard[row][collumn]=0;
 					else
-					
+
 						checkBoard[row][collumn]=queue[0][row][collumn];
 					end
 				end
 			end
-		
+
 			boardHash=create_node_consistent_board(checkBoard,xblks,yblks)
 			if (boardHash!=false and boardHash[1].empty?)
 				solutionFound=true;
-			
-			elsif boardHash==false 
-			
+
+			elsif boardHash==false
+
 				queue=popBoard(queue);
 				p queue[0];
-			
-			
+
+
 				same=true;
 				while same && queue.length>0
-				
-				
+
+
 					if queue[0]==checkBoard
-			
+
 						queue=popBoard(queue);
 					else
 						same=false;
@@ -753,12 +778,12 @@ require 'constraint_sudoku.rb'
 					puts "No Solution"
 					return false;
 				end
-			
+
 			end
-		
+
 		end
 		return checkBoard;
-	
+
 	end
 
 	#localSearch test code
@@ -803,10 +828,9 @@ require 'constraint_sudoku.rb'
 	yblks = 2
 	#yblks = 2
 
-	
+
 	print_board (localSearch(create_node_consistent_board(board,xblks,yblks)[0],xblks, yblks,'minConflicts'));
 
     end
 end
-
 

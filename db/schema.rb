@@ -10,13 +10,20 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101204211402) do
+ActiveRecord::Schema.define(:version => 20101207214740) do
 
   create_table "boards", :force => true do |t|
     t.text    "value"
     t.integer "width"
     t.integer "height"
     t.integer "difficulty"
+  end
+
+  create_table "solutions", :force => true do |t|
+    t.integer  "board_id"
+    t.text     "value"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
 end

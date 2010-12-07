@@ -52,7 +52,7 @@ Raildoku::Application.routes.draw do
 
   # basic sudoku routes
   post 'init' => 'sudoku#init'
-
+  post 'solve' => 'sudoku#solve'
   # See how all your routes lay out with "rake routes"
 
   # This is a legacy wild controller route that's not recommended for RESTful applications.

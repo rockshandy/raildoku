@@ -13,12 +13,12 @@
         %span#start
             %input#init{ :type=>'submit', :name=>'init', :value=>'Initialize' }
             %span#dimensions
-                %input#width{ :type=>'number', :min => 2, :max => 5, :value => 3}
+                =f.number_field( :width, {:id =>'width', :type=>'number', :min => 2, :max => 5, :value => 3})
                 x
-                %input#height{ :type=>'number', :min => 2, :max => 5, :value => 3}
+                =f.number_field( :height, {:id=>'height', :type=>'number', :min => 2, :max => 5, :value => 3})
         %span#help
             %input{ :type=>'button', :name=>'hint', :value=>'Hint' }
             %input{ :type=>'button', :name=>'check', :value=>'Check' }
-            %input{ :type=>'button', :name=>'solve', :value=>'Solve' }
+            %input#solve{ :type=>'submit', :name=>'solve', :value=>'Solve' }
         %input#res{ :type=>'reset', :name=>'resetbtn', :value=>'Reset' }
 

@@ -28,6 +28,8 @@ $(function() {
 
         $('#start').hide();
         $('#help').show();
+        // ensure when submit triggers it's the right action'
+        $('form').attr('action','init')
     });
 
     //need to fiure out how to change this whenever changes or clicked if that's possible?
@@ -44,6 +46,10 @@ $(function() {
         drawBlockBorders($board);
     });
 
+    $('#solve').click(function() {
+        $('form').attr('action','solve')
+    });
+
     $('#res').click(function() {
        // clear anything that had an error
        $('input.error').removeClass();
@@ -51,12 +57,13 @@ $(function() {
        // TODO: how to change the table dimensions! oh could look at value of width probably?
        $('#start').show();
        $('#help').hide();
+       // and change back to init submit
     });
 
     $('form').submit(function(){
         data = ''
         // convert all inputs to a comma seperated list
-        $('#board td').each(function(){
+        $('#board td input').each(function(){
             data += ($(this).val() || '0') + ','
         });
         $('form #board_value').val(data)
