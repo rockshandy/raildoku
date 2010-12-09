@@ -5,12 +5,13 @@
 // since default is silly prototype
 $(function() {
     drawBlockBorders($('#board'));
-    failed = false;
 
     $('#init').click(function(){
+        failed = false;
         // may need to get forms.js plugin
         // basically taking all input and siabling anything filled in
         // I think there is a way to only select fields with a value
+        $('input.error').removeClass();
         $('#board input').each(function() {
             if( this.value!=='' ) {
                 if ( validMove($('board table'),$(this)) ) {
@@ -51,13 +52,13 @@ $(function() {
     });
 
     $('#res').click(function() {
-       // clear anything that had an error
-       $('input.error').removeClass();
-       $('input:disabled').removeAttr('disabled');
-       // TODO: how to change the table dimensions! oh could look at value of width probably?
-       $('#start').show();
-       $('#help').hide();
-       // and change back to init submit
+       // clear values
+       $('#board input').each(function(){
+           $(this).val('')
+       });
+
+       // clear extra
+       reset_board();
     });
 
     $('form').submit(function(){
@@ -68,6 +69,23 @@ $(function() {
         });
         $('form #board_value').val(data)
     })
+    // consider splitting up for init and reset but group for now
+    $('form[data-remote]').bind("ajax:success", function(e, data, status, xhr) {
+        var flash = ''
+        if (data instanceof Object) {
+            $.each(data, function(key,val) {
+                flash += key + ':' + val + '\n'
+            });
+            reset_board();
+            alert(flash);
+        } else if (data.length > 1){
+            // data holds the solved board
+            sol = data.split(',')
+            $(this).find('#board input').each(function(i) {
+                $(this).val(sol[i])
+            });
+        };
+    });
 });
 
 /*@brief validate a position on the sudoku board
@@ -153,5 +171,17 @@ function modBoard($board) {
         // remove any un-needed rows
         $board.find('tr:gt(' + (max - 1) + ')').remove();
     }
+}
+
+// the stuff that happens when a board reset without the values being reset
+// mostly for what happens on error from the server that you'd want to keep
+// the values already in the board for
+function reset_board(){
+    $('input.error').removeClass();
+    $('input:disabled').removeAttr('disabled');
+    // TODO: how to change the table dimensions! oh could look at value of width probably?
+    $('#start').show();
+    $('#help').hide();
+    return false
 }
 

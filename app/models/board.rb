@@ -8,7 +8,9 @@ class Board < ActiveRecord::Base
 
   # for generating a set of board values given a string seperated by commas
   # or an array
-  def self.generate_value(value,width=3,height=3)
+  def self.generate_value(value,width=nil,height=nil)
+    width ||= 3
+    height ||= 3
     max = width * height
 
     if value.respond_to?('split')
