@@ -39,6 +39,7 @@ class SudokuController < ApplicationController
     else
       @sol = Solution.new(:value=>solve['board'])
       @board.solutions << @sol
+      # TODO: May want to return the board that was passed in so can check if that's what originally entered?'
       if @board.save
         render :text => @sol.decode
       else

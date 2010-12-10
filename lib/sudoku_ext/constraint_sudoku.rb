@@ -6,7 +6,7 @@ module ConstraintSudoku
   #prints the sudoku board
   def print_board(board)
     puts "PRINTING BOARD- START\n\n"
-    
+
     if (board == false)
       #	puts "INVALID SUDOKU BOARD... check input"
 	    return
@@ -46,52 +46,51 @@ module ConstraintSudoku
 # validate function, also to do,  have localsearch return the time as a struct passbakc via hash
   def validate(board, xblks, yblks)
      # row in valid
-    
+
   	for x in 0..board.length-1
     		col = Array.new
- 		row = Array.new(board[x]) #need new array not modify board via reference	
+ 		row = Array.new(board[x]) #need new array not modify board via reference
 		block = Array.new(board.length) {Array.new}
     		for y in 0..board.length-1
                         if (board[y][x] != 0)
-				
-      				col.concat([board[y][x]]) 
+
+      				col.concat([board[y][x]])
 			end
 
 			puts [y, x]
  			puts ""
 			if (board[x][y] != 0)
- 				blk = (x/xblks + yblks * y/yblks).floor
-
-				block[blk-1].concat([board[x][y]]) 
+ 				blk = (x/xblks).floor + yblks * (y/yblks).floor
+				block[blk-1].concat([board[x][y]])
 			end
    	 	end
 		row.delete(0)
-                 
-    		if (col.uniq! != nil or row.uniq! != nil) 
-		
-			
+
+    		if (col.uniq! != nil or row.uniq! != nil)
+
+
 			return false
 		end
-		
+
 
   	end
-        
+
         for each in block
 		if each.uniq! != nil
 			return false
 		end
-	end 
+	end
 	return true
    end
 
 
 
-  
 
 
-     
 
-  # fixes an element, this is only called for initial input   
+
+
+  # fixes an element, this is only called for initial input
   # or assignments that are deduced with 100% certainty through constraint propogation
   # This function is the key that leads to node-consistent boards by default
   def assign_spot(board,open, closed, x, y,val, xblks, yblks)
