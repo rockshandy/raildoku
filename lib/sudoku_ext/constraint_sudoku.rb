@@ -2,7 +2,6 @@ module ConstraintSudoku
   def con_ex
     'just anohter thing'
   end
-
   #prints the sudoku board
   def print_board(board)
     puts "PRINTING BOARD- START\n\n"
