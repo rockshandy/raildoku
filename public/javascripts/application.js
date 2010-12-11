@@ -9,7 +9,7 @@ $(function() {
     $('#init').click(function(){
         failed = false;
         // may need to get forms.js plugin
-        // basically taking all input and siabling anything filled in
+        // basically taking all input and disabling anything filled in
         // I think there is a way to only select fields with a value
         $('input.error').removeClass();
         $('#board input').each(function() {
@@ -45,6 +45,30 @@ $(function() {
 
         //redraw borders
         drawBlockBorders($board);
+    });
+
+    $('#board input').live('change',function(e) {
+        // check some constraints
+        if ($(this).val() == '') return
+
+        if (!validMove($('#board'),$(this))) {
+            $(this).addClass('error').attr('data')
+        } else {
+            // in case correctly a previous errored cell
+            $(this).removeClass('error')
+        }
+    })
+
+    $('input.error').live('mouseenter mouseleave', function(event) {
+        if (event.type == 'mouseenter') {
+            // display error message
+            $(this).after('<aside class="errBox">'
+                 + $(this).attr('data-msg')
+                 + '</aside>')
+        } else {
+            // hide it
+            $('aside.errBox').remove()
+        }
     });
 
     $('#solve').click(function() {
@@ -99,13 +123,68 @@ $(function() {
  *  classes to everything intially once size is acquired
  */
 function validMove ($board,$pos) {
-    var valid = false;
-    var max = maxVal();
+    var stillValid = true
+    var notChecking = ':not(input[data-checking])'
+    var posVal = $pos.val()
+    var $td = $pos.closest('td')
+    var msg = null
+
+    // add data-checking to figure out which cell this is
+    // which will simplify selecting by using :not(input[data-checking])
+    // and first remove anything that was checked last round
+    $board.find('input[data-checking]').removeAttr('data-checking')
+    $pos.attr('data-checking','true')
+
     // need to know how to ensure we have a number...
     // also need to strip the val() of whitespace
-    if ( $pos.val() > 0 && $pos.val() <= maxVal() ) valid = true
+    // TODO: make this || group quicker
+    if ( posVal <= 0 || posVal > maxVal() || !+posVal ) {
+        stillValid = false
+        msg = 'Value should be within 1 and ' + maxVal()
+    } else {
+        // check row
+        $td.siblings().each(function(){
+            if (posVal == $(this).find('input').val()) {
+                stillValid = false
+                msg = 'Oh noes, there is a dublicate in this row!'
+                return false
+            }
+        });
 
-    return valid
+        if (stillValid) {
+            // check column
+            $('tr td:nth-child('
+                + ($td.prevAll().length + 1)
+                + ') input'+notChecking)
+                .each(function(){
+                    if (posVal == $(this).val() ) {
+                        msg = 'Aww snap,there is dublicate in this column'
+                        stillValid = false
+                        return false
+                    }
+                })
+
+            if (stillValid) {
+                // check block
+                $('input[data-blk="' + $pos.attr('data-blk') + '"]' + notChecking)
+                    .each(function(){
+                        if (posVal == $(this).val() ) {
+                            stillValid = false
+                            msg = 'Drat, there is a dublicate value in this block!'
+                            return false
+                        }
+                    });
+            }
+        }
+    }
+
+    if (stillValid){
+        // apply message to position so hovering reveals what happened
+        $pos.removeAttr('data-msg')
+    } else {
+        $pos.attr('data-msg',msg)
+    }
+    return stillValid
 }
 function removeBlockBorders($board) {
     var height = Math.sqrt($board.find('tr').length);
@@ -124,8 +203,16 @@ function drawBlockBorders($board) {
     var height = $('#height').val();
     var width = $('#width').val();
 
+    // add block grid
     $board.find('tr:nth-child(' + height + 'n+1)').addClass('grid');
     $board.find('tr td:nth-child(' + width + 'n+1)').addClass('grid');
+
+    // add block numbers in data-blk attr
+    $board.find('tr').each(function(j){
+        $(this).find('input').each(function(i){
+            $(this).attr('data-blk',Math.floor(i/height) + width * Math.floor(j/width))
+        });
+    });
 }
 
 function maxVal() {

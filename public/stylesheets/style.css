@@ -32,3 +32,10 @@ section h1 {
 
 #help {
   display: none; }
+
+aside.errBox {
+  height: 20px;
+  right: 5px;
+  top: 5px;
+  position: absolute;
+  witdh: 100px; }
