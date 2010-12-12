@@ -31,10 +31,12 @@ module ConstraintSudoku
 	    change_made = false
 	    for position in open
 		    if board[position[0]][position[1]].length == 1
-			    if (!assign_spot(board, open, closed, position[0], position[1], board[position[0]][position[1]][0], xblks, yblks))
+			    if (!assign_spot(board, open, position[0], position[1], board[position[0]][position[1]][0], xblks, yblks))
 			       return false
-                                   end
-			    change_made = true
+                            end
+			    closed.concat([[x,y]])
+			    
+		            change_made = true
 		    end
 	    end
       end
@@ -92,9 +94,9 @@ module ConstraintSudoku
   # fixes an element, this is only called for initial input
   # or assignments that are deduced with 100% certainty through constraint propogation
   # This function is the key that leads to node-consistent boards by default
-  def assign_spot(board,open, closed, x, y,val, xblks, yblks)
+  def assign_spot(board,open,x, y,val, xblks, yblks)
     open.delete([x,y])
-    closed.concat([[x,y]])
+   
     board[x][y] = val
     for position in open
 	    # the last part of this is is checking blocks  mapping of x,y -> blk = x/xblks + yblks*(y/yblks)  using integer division
@@ -158,7 +160,7 @@ module ConstraintSudoku
 			    #assigns cell and removes cell from open list,
    				# and removes value from cells involved in
 			    #constraints with this one
-			    if (!assign_spot(board,open,closed, x, y, inval, xblks, yblks))
+			    if (!assign_spot(board,open,x, y, inval, xblks, yblks))
 				    #puts "INVALID SUDOKU BOARD", x, y, inval
    					print_board(board)
 				    return false
