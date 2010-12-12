@@ -7,16 +7,16 @@ $(function() {
     drawBlockBorders($('#board'));
 
     $('#init').click(function(){
-        failed = false;
-        // may need to get forms.js plugin
+        var failed = false;
+        var $matched = $();
         // basically taking all input and disabling anything filled in
-        // I think there is a way to only select fields with a value
+        // TODO: there might be a way to only select fields with a value
         $('input.error').removeClass();
         $('#board input').each(function() {
             if( this.value!=='' ) {
-                if ( validMove($('board table'),$(this)) ) {
-                    // any value that is filled in is made perminent
-                    $(this).attr('disabled','disabled')
+                if ( validMove($('#board'),$(this)) ) {
+                    // any value that is filled in is made perminent if no failures
+                    $matched = $matched.add(this)
                 } else {
                     // shade in error
                     $(this).addClass('error')
@@ -25,7 +25,11 @@ $(function() {
             }
         })
 
-        if (failed) {return false};
+        if (failed) {
+            return false
+        } else {
+            $matched.attr('disabled','disabled')
+        };
 
         $('#start').hide();
         $('#help').show();
@@ -48,6 +52,9 @@ $(function() {
     });
 
     $('#board input').live('change',function(e) {
+        // this should only work begore initialization
+        if ($('#init:visible').length == 0) return
+
         // check some constraints
         if ($(this).val() == '') return
 
@@ -58,7 +65,7 @@ $(function() {
             $(this).removeClass('error')
         }
     })
-
+    // FIXME: this box is not displaying where it should
     $('input.error').live('mouseenter mouseleave', function(event) {
         if (event.type == 'mouseenter') {
             // display error message
@@ -75,22 +82,74 @@ $(function() {
         $('form').attr('action','solve')
     });
 
-    $('#res').click(function() {
-       // clear values
-       $('#board input').each(function(){
-           $(this).val('')
-       });
+    // for now picks a random spot from funning constaints on the board
+    $('#hint').click(function(){
+        // first need to make sure the board has been checked
+        $('#check').click()
+        if ($('input.error').length > 0) return false
 
-       // clear extra
-       reset_board();
+        data = {
+            value: getBoardValues($('#board')),
+            width: $('#width').val(),
+            height: $('#height').val()
+        }
+
+        $.getJSON('hint',data, function(data, textStatus, xhr) {
+            var irand
+            var closed = data[2]
+            var open = data[1]
+            var board = data[0]
+            var i,j
+            // look through closed list and see if any values were set
+            if (closed.length > 0) {
+                irand = Math.floor(Math.random()*closed.length)
+                // then fill in that square and hfilled class
+                i = closed[irand][0]
+                j = closed[irand][1]
+                $('#board tr:nth-child(' + (i + 1) + ')'
+                    + ' td:nth-child(' + (j + 1) + ')'
+                    + ' input').val(board[i][j])
+            }
+        });
+    });
+    // TODO: make this live hover aspect cookie cutter function so hint or errors can use it
+    // perhaps change the error class to simply a data-err attribute, which would change data-msg to that as well
+    // then could have the names hintBox and errBox could just pass in 'hint' or 'err' to generate!
+    $('input[data-hint]').live('mouseenter mouseleave', function(event) {
+        if (event.type == 'mouseenter') {
+            // display error message
+            $(this).after('<aside class="hintBox">'
+                 + $(this).attr('data-hint')
+                 + '</aside>')
+        } else {
+            // hide it
+            $('aside.hintBox').remove()
+        }
+    });
+
+    // checks entire board for any invalid cells
+    $('#check').click(function(){
+        $('#board input:enabled').each(function() {
+            if( this.value!=='' && !validMove($('#board'),$(this)) ) {
+                $(this).addClass('error')
+            } else {
+                $(this).removeClass('error')
+            }
+        })
+    });
+
+    $('#res').click(function() {
+        // clear values
+        $('#board input').each(function(){
+           $(this).val('')
+        });
+
+        // clear extra
+        reset_board();
     });
 
     $('form').submit(function(){
-        data = ''
-        // convert all inputs to a comma seperated list
-        $('#board td input').each(function(){
-            data += ($(this).val() || '0') + ','
-        });
+        data = getBoardValues($('#board'))
         $('form #board_value').val(data)
     })
     // consider splitting up for init and reset but group for now
@@ -120,14 +179,16 @@ $(function() {
  *  @return boolean representing validaty
  *
  *  might be able to make faster with some jquery tricks or just assigning
- *  classes to everything intially once size is acquired
+ *  classes to everything intially once size is acquired. Currently finds all
+ *  errors with a cell, can pass in optional true to use StillValid and fail
+ *  as soon as one error is found
  */
-function validMove ($board,$pos) {
+function validMove ($board,$pos,failFast) {
     var stillValid = true
     var notChecking = ':not(input[data-checking])'
     var posVal = $pos.val()
     var $td = $pos.closest('td')
-    var msg = null
+    var msg = 'Oh noes, there is a dublicate in this'
 
     // add data-checking to figure out which cell this is
     // which will simplify selecting by using :not(input[data-checking])
@@ -146,31 +207,33 @@ function validMove ($board,$pos) {
         $td.siblings().each(function(){
             if (posVal == $(this).find('input').val()) {
                 stillValid = false
-                msg = 'Oh noes, there is a dublicate in this row!'
+                msg += ' row'
                 return false
             }
         });
 
-        if (stillValid) {
+        if (stillValid || !failFast) {
             // check column
             $('tr td:nth-child('
                 + ($td.prevAll().length + 1)
                 + ') input'+notChecking)
                 .each(function(){
                     if (posVal == $(this).val() ) {
-                        msg = 'Aww snap,there is dublicate in this column'
+                        msg += (stillValid ? ' column'
+                                           : ' and column')
                         stillValid = false
                         return false
                     }
                 })
 
-            if (stillValid) {
+            if (stillValid || !failFast) {
                 // check block
                 $('input[data-blk="' + $pos.attr('data-blk') + '"]' + notChecking)
                     .each(function(){
                         if (posVal == $(this).val() ) {
+                             msg += (stillValid ? ' block'
+                                                : ' and block')
                             stillValid = false
-                            msg = 'Drat, there is a dublicate value in this block!'
                             return false
                         }
                     });
@@ -179,9 +242,10 @@ function validMove ($board,$pos) {
     }
 
     if (stillValid){
-        // apply message to position so hovering reveals what happened
+        // remove any previous message
         $pos.removeAttr('data-msg')
     } else {
+         // apply message to position so hovering reveals what happened
         $pos.attr('data-msg',msg)
     }
     return stillValid
@@ -197,8 +261,6 @@ function removeBlockBorders($board) {
  *
  *  will be more general purpose later where you can use it like any jquery function
  */
- //TODO: way to do this with straight css? perhaps look at nth or eq filters
-
 function drawBlockBorders($board) {
     var height = $('#height').val();
     var width = $('#width').val();
@@ -270,5 +332,15 @@ function reset_board(){
     $('#start').show();
     $('#help').hide();
     return false
+}
+
+// get the values from the board for ajax requests
+function getBoardValues ($board) {
+    data = ''
+    // convert all inputs to a comma seperated list
+    $board.find('input').each(function(){
+        data += ($(this).val() || '0') + ','
+    });
+    return data
 }
 

@@ -26,6 +26,11 @@ section h1 {
     border-top: 1px solid black; }
   #board td.grid {
     border-left: 1px solid black; }
+  #board input.hfilled {
+    font-weight: bold;
+    color: green; }
+  #board input[data-hint] {
+    background-color: green; }
 
 #dimensions input[type=number] {
   width: 40px; }

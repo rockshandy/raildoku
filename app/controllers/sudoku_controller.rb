@@ -48,6 +48,18 @@ class SudokuController < ApplicationController
     end
   end
 
+  def hint
+    puts 'try hint!'
+
+    value = Board.generate_value(params[:value].chomp(','),
+              params[:width],
+              params[:height])
+
+    data = create_node_consistent_board(value,params[:height].to_i, params[:width].to_i)
+
+    render :json => data
+  end
+
   # TODO: add a save button to keep saving boards perhaps and put in sessions
   def update
   end

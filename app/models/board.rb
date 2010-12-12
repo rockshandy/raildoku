@@ -11,7 +11,7 @@ class Board < ActiveRecord::Base
   def self.generate_value(value,width=nil,height=nil)
     width ||= 3
     height ||= 3
-    max = width * height
+    max = width.to_i * height.to_i
 
     if value.respond_to?('split')
       # then initial board was a string
