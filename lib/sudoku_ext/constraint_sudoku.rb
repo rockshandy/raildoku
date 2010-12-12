@@ -94,7 +94,7 @@ module ConstraintSudoku
   # This function is the key that leads to node-consistent boards by default
   def assign_spot(board,open, closed, x, y,val, xblks, yblks)
     open.delete([x,y])
-    closed.concat([x,y])
+    closed.concat([[x,y]])
     board[x][y] = val
     for position in open
 	    # the last part of this is is checking blocks  mapping of x,y -> blk = x/xblks + yblks*(y/yblks)  using integer division
