@@ -6,6 +6,17 @@
 $(function() {
     drawBlockBorders($('#board'));
 
+    $('#difficulty button').click(function(){
+        var seed = '1,9,,,6,,7,,8,,,,,,7,,,5,7,,,2,3,,,,,,1,,,,,5,,,3,,6,,,,4,,9,,,9'
+                 + ',,,,,7,,,,,,1,5,,,3,5,,,9,,,,,,9,,3,,7,,,5,2'
+        seed = seed.split(',');
+
+        reset_board()
+        $('#board input').each(function(i){
+            $(this).val(seed[i])
+        });
+    });
+
     $('#init').click(function(){
         var failed = false;
         var $matched = $();
@@ -174,18 +185,24 @@ $(function() {
     // consider splitting up for init and reset but group for now
     $('form[data-remote]').bind("ajax:success", function(e, data, status, xhr) {
         var flash = ''
-        if (data instanceof Object) {
-            $.each(data, function(key,val) {
+        if (data.board === undefined) {
+            $.each(data.error, function(key,val) {
                 flash += key + ':' + val + '\n'
             });
             reset_board();
             alert(flash);
-        } else if (data.length > 1){
+        } else {
+            //FIXME: for some reason in INIT eventually tries to find a length of undefined?
             // data holds the solved board
-            sol = data.split(',')
+            sol = data.board.split(',')
             $(this).find('#board input').each(function(i) {
                 $(this).val(sol[i])
             });
+
+            // also populate and show stats!
+            $('#stats').find('p:first').text('Time: ' + data.time)
+            $('#stats').find('p:last').text('Boards Generated: ' + data.num_boards)
+            $('#stats').show();
         };
     });
 });
@@ -350,6 +367,7 @@ function reset_board(){
     $('.start').show();
     $('#help').hide();
     $('input[data-hint]').removeAttr('data-hint')
+    $('#stats').hide();
     return false
 }
 

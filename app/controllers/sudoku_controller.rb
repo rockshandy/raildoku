@@ -19,7 +19,7 @@ class SudokuController < ApplicationController
     if @board.save
       head :created
     else
-      render :json => @board.errors
+      render :json => {:error => @board.errors}
     end
   end
 
@@ -40,11 +40,10 @@ class SudokuController < ApplicationController
       @sol = Solution.new(:value=>solve['board'])
       @board.solutions << @sol
       # TODO: May want to return the board that was passed in so can check if that's what originally entered?'
-      if @board.save
-        render :text => @sol.decode
-      else
-        render :json => @board.errors
-      end
+      @board.save
+
+      solve['board'] = @sol.decode
+      render :json => solve
     end
   end
 

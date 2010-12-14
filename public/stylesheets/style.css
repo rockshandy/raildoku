@@ -75,12 +75,13 @@ body {
   #controls p {
     margin: 5px 0 0 0; }
 
-#results {
+#stats {
   border: 1px solid black;
   width: 300px;
-  margin: 0 auto;
-  background-color: #d8e3ec; }
-  #results h1 {
+  margin: 0 auto 10px;
+  background-color: #d8e3ec;
+  display: none; }
+  #stats h1 {
     background-color: #51718c;
     padding: 0;
     margin: 0;
