@@ -136,7 +136,7 @@ $(function() {
                 j = open[irand][1]
                 $('#board tr:nth-child(' + (i + 1) + ')'
                     + ' td:nth-child(' + (j + 1) + ')'
-                    + ' input').attr('data-hint',board[i][j])
+                    + ' input').attr('data-hint',board[i][j].join(', '))
             }
         });
     });
@@ -184,11 +184,16 @@ $(function() {
     })
     // consider splitting up for init and reset but group for now
     $('form[data-remote]').bind("ajax:success", function(e, data, status, xhr) {
+        if (data == " ") return
         var flash = ''
         if (data.board === undefined) {
-            $.each(data.error, function(key,val) {
-                flash += key + ':' + val + '\n'
-            });
+            if (data.error instanceof Object) {
+                $.each(data.error, function(key,val) {
+                    flash += key + ':' + val + '\n'
+                });
+            } else {
+                flash = data.error
+            }
             reset_board();
             alert(flash);
         } else {

@@ -31,6 +31,12 @@
                 %input#solve{ :type=>'submit', :name=>'solve', :value=>'Solve' }
             %input#res{ :type=>'button', :name=>'resetbtn', :value=>'Reset' }
             %p.start cell [w x h]
+            %p
+                <b>Heuristic:</b>
+                Conflicts
+                =radio_button_tag('hn', value='0')
+                Constrainted
+                =radio_button_tag('hn',  value='1', checked=true)
 %section#stats
     %h1 Some Stats From Solving
     %p some stats

@@ -37,6 +37,8 @@ body
         :font-weight none
         :text-align center
         :width 20px
+    td
+        :position relative
     td, input[disabled]
         :font-weight bold
     tr.grid
@@ -92,11 +94,15 @@ body
 
 // Fance error box
 aside.errBox, aside.hintBox
-    :height 20px
-    :right 5px
-    :top 5px
     :position absolute
-    :witdh 100px
+    :top 5px
+    :right 5px
+    :width 100px
+    :-webkit-box-shadow -5px -5px 5px #888
+    :-moz-box-shadow -5px -5px 5px #888
+    :background-color #D8E3EC
+    :border 1px solid black
+    :z-position 200
 
 // borders
 .bottom-border

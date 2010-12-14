@@ -2,6 +2,9 @@ class Board < ActiveRecord::Base
   has_many :solutions
   serialize :value
 
+  #TODO: make this work for reals, for now just show check boxes
+  attr_accessor :hn
+
   validates_presence_of :width, :height
   #validate :constraints
   #TODO: validations, big one with board relation to width and height
