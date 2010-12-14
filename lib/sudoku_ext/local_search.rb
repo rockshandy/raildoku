@@ -755,7 +755,7 @@ require 'constraint_sudoku.rb'
 
 			if queue.nil? or queue.empty?
 				#no solution
-				return false;
+				return {'board' => false, 'error' => 'Queue empty, no solution'};
 			end
 
 

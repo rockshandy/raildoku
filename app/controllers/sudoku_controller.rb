@@ -34,8 +34,8 @@ class SudokuController < ApplicationController
     # this just happens to work that way
     solve = (solve_sudoku(@board.value, :xblks => @board.height,:yblks => @board.width));
 
-    if solve[:error]
-      render :json => {:error => solve[:error]}
+    if solve['error']
+      render :json => {:error => solve['error']}
     else
       @sol = Solution.new(:value=>solve['board'])
       @board.solutions << @sol

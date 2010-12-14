@@ -11,11 +11,12 @@
 
     =form_for :board, :url => 'init', :remote => true do |f|
         %table#board
-            -for y in 1..9
-                %tr
-                    -for x in 1..9
-                        %td
-                            %input{ :type=>'text', :size=>'1' }
+            %tbody
+                -for y in 1..9
+                    %tr
+                        -for x in 1..9
+                            %td
+                                %input{ :type=>'text', :size=>'1' }
         =f.hidden_field(:value)
 
         %section#controls

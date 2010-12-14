@@ -35,8 +35,6 @@ body {
     font-weight: none;
     text-align: center;
     width: 20px; }
-  #board td {
-    position: relative; }
   #board td, #board input[disabled] {
     font-weight: bold; }
   #board tr.grid {
@@ -92,7 +90,7 @@ body {
 aside.errBox, aside.hintBox {
   position: absolute;
   top: 5px;
-  right: 5px;
+  right: 10px;
   width: 100px;
   -webkit-box-shadow: -5px -5px 5px #888888;
   -moz-box-shadow: -5px -5px 5px #888888;
