@@ -1,6 +1,14 @@
-%h1 Sudoku on Rails... you're new best friend
+%header Sudoku on Rails... you're new best friend
 %section
     %h1 -Your Game Board-
+    %aside#difficulty.left.right-border
+        %button E
+        %br/
+        %button M
+        %br/
+        %button< H
+        %br/
+
     =form_for :board, :url => 'init', :remote => true do |f|
         %table#board
             -for y in 1..9
@@ -10,15 +18,21 @@
                             %input{ :type=>'text', :size=>'1' }
         =f.hidden_field(:value)
 
-        %span#start
-            %input#init{ :type=>'submit', :name=>'init', :value=>'Initialize' }
-            %span#dimensions
-                =f.number_field( :width, {:id =>'width', :type=>'number', :min => 2, :max => 5, :value => 3})
-                x
-                =f.number_field( :height, {:id=>'height', :type=>'number', :min => 2, :max => 5, :value => 3})
-        %span#help
-            %input#hint{ :type=>'button', :name=>'hint', :value=>'Hint' }
-            %input#check{ :type=>'button', :name=>'check', :value=>'Check' }
-            %input#solve{ :type=>'submit', :name=>'solve', :value=>'Solve' }
-        %input#res{ :type=>'reset', :name=>'resetbtn', :value=>'Reset' }
+        %section#controls
+            %span.start
+                %input#init{ :type=>'submit', :name=>'init', :value=>'Initialize' }
+                %span#dimensions
+                    =f.number_field( :width, {:id =>'width', :type=>'number', :min => 2, :max => 5, :value => 3})
+                    x
+                    =f.number_field( :height, {:id=>'height', :type=>'number', :min => 2, :max => 5, :value => 3})
+            %span#help
+                %input#hint{ :type=>'button', :name=>'hint', :value=>'Hint' }
+                %input#check{ :type=>'button', :name=>'check', :value=>'Check' }
+                %input#solve{ :type=>'submit', :name=>'solve', :value=>'Solve' }
+            %input#res{ :type=>'button', :name=>'resetbtn', :value=>'Reset' }
+            %p.start cell [w x h]
+%section#results
+    %h1 Some Stats From Solving
+    %p some stats
+    %p and even cooler stats
 

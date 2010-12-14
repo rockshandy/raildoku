@@ -54,8 +54,7 @@ class SudokuController < ApplicationController
     value = Board.generate_value(params[:value].chomp(','),
               params[:width],
               params[:height])
-
-    data = create_node_consistent_board(value,params[:height].to_i, params[:width].to_i)
+    data = create_node_consistent_board(value, params[:height].to_i, params[:width].to_i)
 
     render :json => data
   end

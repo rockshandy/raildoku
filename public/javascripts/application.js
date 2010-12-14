@@ -31,7 +31,7 @@ $(function() {
             $matched.attr('disabled','disabled')
         };
 
-        $('#start').hide();
+        $('.start').hide();
         $('#help').show();
         // ensure when submit triggers it's the right action'
         $('form').attr('action','init')
@@ -83,6 +83,8 @@ $(function() {
     });
 
     // for now picks a random spot from funning constaints on the board
+    //TODO: add common code to a function you can call maybe?
+    // OPTIMIZE: make everything dry!
     $('#hint').click(function(){
         // first need to make sure the board has been checked
         $('#check').click()
@@ -100,6 +102,12 @@ $(function() {
             var open = data[1]
             var board = data[0]
             var i,j
+
+            if (data===false) {
+                alert('Oops the board is invalid, might want to roll back some steps')
+                return false
+            }
+
             // look through closed list and see if any values were set
             if (closed.length > 0) {
                 irand = Math.floor(Math.random()*closed.length)
@@ -109,9 +117,20 @@ $(function() {
                 $('#board tr:nth-child(' + (i + 1) + ')'
                     + ' td:nth-child(' + (j + 1) + ')'
                     + ' input').val(board[i][j])
+            } else {
+                // have to use the open list and just hint at possible fill ins
+                irand = Math.floor(Math.random()*open.length)
+                // add hint values and message
+                i = open[irand][0]
+                j = open[irand][1]
+                $('#board tr:nth-child(' + (i + 1) + ')'
+                    + ' td:nth-child(' + (j + 1) + ')'
+                    + ' input').attr('data-hint',board[i][j])
             }
         });
     });
+    // FIXME: if unsolvable with aditional user input (after initialize) tell to first try and roll back further input
+    //          since not doing background can't really solve intill that button is actually hit
     // TODO: make this live hover aspect cookie cutter function so hint or errors can use it
     // perhaps change the error class to simply a data-err attribute, which would change data-msg to that as well
     // then could have the names hintBox and errBox could just pass in 'hint' or 'err' to generate!
@@ -272,7 +291,7 @@ function drawBlockBorders($board) {
     // add block numbers in data-blk attr
     $board.find('tr').each(function(j){
         $(this).find('input').each(function(i){
-            $(this).attr('data-blk',Math.floor(i/height) + width * Math.floor(j/width))
+            $(this).attr('data-blk',Math.floor(i/width) + height * Math.floor(j/height))
         });
     });
 }
@@ -328,9 +347,9 @@ function modBoard($board) {
 function reset_board(){
     $('input.error').removeClass();
     $('input:disabled').removeAttr('disabled');
-    // TODO: how to change the table dimensions! oh could look at value of width probably?
-    $('#start').show();
+    $('.start').show();
     $('#help').hide();
+    $('input[data-hint]').removeAttr('data-hint')
     return false
 }
 
