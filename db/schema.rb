@@ -22,6 +22,9 @@ ActiveRecord::Schema.define(:version => 20101207214740) do
   create_table "solutions", :force => true do |t|
     t.integer  "board_id"
     t.text     "value"
+    t.integer  "generated"
+    t.float    "time"
+    t.string   "hn"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

@@ -55,6 +55,7 @@ Raildoku::Application.routes.draw do
     post 'init', :to => :init
     post 'solve', :to => :solve
     get 'hint', :to => :hint
+    get 'test', :to => :test
   end
   # See how all your routes lay out with "rake routes"
 

@@ -4,6 +4,9 @@ class CreateSolutions < ActiveRecord::Migration
       # TODO: can probably just make this the primary key...
       t.integer :board_id
       t.text :value
+      t.integer :generated
+      t.float :time
+      t.string :hn
       t.timestamps
     end
   end

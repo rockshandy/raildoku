@@ -45,7 +45,7 @@ module ConstraintSudoku
 
 
 # validate function, also to do,  have localsearch return the time as a struct passbakc via hash
-  def validate(board, xblks, yblks)
+  def validation(board, xblks, yblks)
      # row in valid
 
   	for x in 0..board.length-1

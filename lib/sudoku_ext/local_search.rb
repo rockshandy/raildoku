@@ -698,7 +698,7 @@ require 'constraint_sudoku.rb'
 			iterations += 1 # represents # of changes to the board
                         if (Time.now - starttime >  time_limit )  # return hash
 
-                               return {'board'=>false, 'time'=> Time.now-startime, 'error'=>"Time Limit Exceeded", 'num_boards'=> iterations};
+                               return {'board'=>false, 'time'=> Time.now - starttime, 'error'=>"Time Limit Exceeded", 'num_boards'=> iterations};
                                # hash-  (board, time, error,  board counts)
                          end
 
